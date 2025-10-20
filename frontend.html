@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helpdesk Agent - AI Ticket Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2::before {
+            content: "📋";
+            font-size: 1.2em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border 0.3s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .file-upload {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .file-upload:hover {
+            background: #f8f9ff;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload-label {
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            margin-top: 10px;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-process {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            font-size: 1.2em;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .results-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .evidence-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .file-list {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            padding: 8px;
+            background: white;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🤖 Helpdesk Agent</h1>
+            <p>AI-Powered Ticket Resolution Assistant</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Submit Form -->
+            <div class="card">
+                <h2>Submit New Ticket</h2>
+                <form id="ticketForm">
+                    <div class="form-group">
+                        <label for="issue">Issue Title *</label>
+                        <input type="text" id="issue" name="issue" placeholder="e.g., VPN connection timeout" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description *</label>
+                        <textarea id="description" name="description" placeholder="Describe the problem in detail..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category">
+                            <option value="">-- Select Category --</option>
+                            <option value="Network">Network</option>
+                            <option value="Email">Email</option>
+                            <option value="Hardware">Hardware</option>
+                            <option value="Software">Software</option>
+                            <option value="Account">Account Management</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Submit Ticket</button>
+                </form>
+                <div id="submitStatus" class="status"></div>
+            </div>
+
+            <!-- Upload File -->
+            <div class="card">
+                <h2>Upload Ticket File</h2>
+                <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                    <div class="file-upload-label">
+                        📁 Click to upload CSV, XLSX, or JSON
+                    </div>
+                    <p style="color: #999; font-size: 0.9em; margin-top: 10px;">
+                        Upload multiple tickets at once
+                    </p>
+                    <input type="file" id="fileInput" accept=".csv,.xlsx,.json">
+                </div>
+                <div id="uploadStatus" class="status"></div>
+                
+                <div id="inputFilesList" class="file-list" style="display:none;">
+                    <strong>Files in input folder:</strong>
+                    <div id="inputFiles"></div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="loadInputFiles()">
+                    🔄 Refresh File List
+                </button>
+                <button class="btn btn-danger" onclick="clearInput()">
+                    🗑️ Clear Input Folder
+                </button>
+            </div>
+        </div>
+
+        <!-- Process Button -->
+        <div class="card">
+            <button class="btn btn-process" onclick="processTickets()">
+                🚀 Process All Tickets
+            </button>
+            <div class="spinner" id="spinner"></div>
+            <div id="processStatus" class="status"></div>
+        </div>
+
+        <!-- Results -->
+        <div class="results-section" id="resultsSection">
+            <h2 style="margin-bottom: 20px;">📊 Processing Results</h2>
+            <div id="resultsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configure your backend URL here
+        // For local backend: 'http://localhost:8004'
+        // For deployed backend: 'https://your-backend-url.com'
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8004' 
+            : 'http://localhost:8004';  // Change this to your deployed backend URL
+
+        // Submit ticket form
+        document.getElementById('ticketForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const issue = document.getElementById('issue').value;
+            const description = document.getElementById('description').value;
+            const category = document.getElementById('category').value;
+            
+            const statusDiv = document.getElementById('submitStatus');
+            statusDiv.textContent = 'Submitting...';
+            statusDiv.className = 'status info';
+            statusDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch(`${API_URL}/submit-ticket`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ issue, description, category })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusDiv.textContent = '✅ ' + data.message;
+                    statusDiv.className = 'status success';
+                    document.getElementById('ticketForm').reset();
+                    loadInputFiles();
+                } else {
+                    throw new Error(data.detail || 'Submission failed');
+                }
+            } catch (error) {
+                statusDiv.textContent = '❌ Error: ' + error.message;
+                statusDiv.className = 'status error';
+            }
+        });
+
+        // File upload
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const statusDiv = document.getElementById('uploadStatus');
+            statusDiv.textContent = 'Uploading...';
+            statusDiv.className = 'status info';
+            statusDiv.style.display = 'block';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`${API_URL}/upload-file`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusDiv.textContent = '✅ ' + data.message;
+                    statusDiv.className = 'status success';
+                    document.getElementById('fileInput').value = '';
+                    loadInputFiles();
+                } else {
+                    throw new Error(data.detail || 'Upload failed');
+                }
+            } catch (error) {
+                statusDiv.textContent = '❌ Error: ' + error.message;
+                statusDiv.className = 'status error';
+            }
+        });
+
+        // Load input files
+        async function loadInputFiles() {
+            try {
+                const response = await fetch(`${API_URL}/list-input`);
+                const data = await response.json();
+                
+                const listDiv = document.getElementById('inputFilesList');
+                const filesDiv = document.getElementById('inputFiles');
+                
+                if (data.count > 0) {
+                    filesDiv.innerHTML = data.files.map(f => 
+                        `<div class="file-item">
+                            <span>📄 ${f}</span>
+                            <span class="badge badge-success">Ready</span>
+                        </div>`
+                    ).join('');
+                    listDiv.style.display = 'block';
+                } else {
+                    listDiv.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading files:', error);
+            }
+        }
+
+        // Clear input folder
+        async function clearInput() {
+            if (!confirm('Clear all files from input folder?')) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/clear-input`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                alert(data.message);
+                loadInputFiles();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Process tickets
+        async function processTickets() {
+            const statusDiv = document.getElementById('processStatus');
+            const spinner = document.getElementById('spinner');
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            statusDiv.textContent = 'Processing tickets... This may take a minute.';
+            statusDiv.className = 'status info';
+            statusDiv.style.display = 'block';
+            spinner.style.display = 'block';
+            resultsSection.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_URL}/process-tickets`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                spinner.style.display = 'none';
+                
+                if (response.ok) {
+                    statusDiv.textContent = `✅ ${data.message}`;
+                    statusDiv.className = 'status success';
+                    
+                    // Display results
+                    resultsContainer.innerHTML = data.results.map((r, i) => `
+                        <div class="result-item">
+                            <h3>Ticket #${r.ticket_number}: ${r.issue}</h3>
+                            ${r.category ? `<span class="badge badge-warning">${r.category}</span>` : ''}
+                            
+                            <h4 style="margin-top: 15px;">💡 Suggested Direction:</h4>
+                            <pre style="white-space: pre-wrap; font-family: inherit;">${r.direction_bullets}</pre>
+                            
+                            <h4 style="margin-top: 15px;">📚 Evidence (${r.evidence.length} similar tickets):</h4>
+                            ${r.evidence.slice(0, 3).map(e => `
+                                <div class="evidence-item">
+                                    <strong>${e.ticket_id}</strong>: ${e.Issue} 
+                                    <span class="badge badge-${e.Resolved === 'True' ? 'success' : 'warning'}">
+                                        Resolved: ${e.Resolved}
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `).join('');
+                    
+                    resultsSection.style.display = 'block';
+                } else {
+                    throw new Error(data.detail || 'Processing failed');
+                }
+            } catch (error) {
+                spinner.style.display = 'none';
+                statusDiv.textContent = '❌ Error: ' + error.message;
+                statusDiv.className = 'status error';
+            }
+        }
+
+        // Load files on page load
+        loadInputFiles();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,10 @@
+# Netlify Configuration for Frontend
+
+[build]
+  publish = "."
+  
+[[redirects]]
+  from = "/*"
+  to = "/frontend.html"
+  status = 200
+
