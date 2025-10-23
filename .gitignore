@@ -37,3 +37,10 @@ Thumbs.db
 # Logs
 *.log
 
+# Documentation - Keep only specific .md files in Git
+# (All .md files stay local, but only these are tracked in Git)
+*.md
+!README.md
+!Most complete_Document.md
+!BACKEND_GUIDE.md
+
