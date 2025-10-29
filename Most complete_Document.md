@@ -254,11 +254,6 @@ temperature=0.1         # Low = focused, high = creative
 do_sample=False         # Greedy decoding (pick most likely word)
 ```
 
-**Current Issues (see Fix #4):**
-1. ⚠️ Prompt format not optimal for Llama-3.1
-2. ⚠️ No few-shot examples (LLM doesn't see citation examples)
-3. ⚠️ Contradictory sampling parameters
-
 ---
 
 ### **Agent 5: Validator** (Lines 274-350)
