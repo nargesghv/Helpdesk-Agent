@@ -4,21 +4,23 @@ __pycache__/
 *$py.class
 *.so
 .Python
-*.egg-info/
-dist/
-build/
-
-# Virtual Environment
-agent/
-venv/
 env/
+venv/
 ENV/
+.venv
 
-# Data & Output
+# Artifacts (will be generated on server)
 artifacts/
-output/
-*.parquet
 *.index
+*.parquet
+
+# Input/Output (uploaded data)
+input/
+output/
+
+# Environment variables
+.env
+.env.local
 
 # IDE
 .vscode/
@@ -30,17 +32,9 @@ output/
 .DS_Store
 Thumbs.db
 
-# Environment
-.env
-.env.local
-
 # Logs
 *.log
 
-# Documentation - Keep only specific .md files in Git
-# (All .md files stay local, but only these are tracked in Git)
+# Documentation (keep local only)
 *.md
 !README.md
-!Most complete_Document.md
-!BACKEND_GUIDE.md
-
