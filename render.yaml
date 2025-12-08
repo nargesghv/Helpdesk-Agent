@@ -3,11 +3,12 @@ services:
     name: helpdesk-agent
     env: python
     plan: free
+    runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn backend:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: GROQ_API_KEY
         sync: false
       - key: PYTHON_VERSION
-        value: 3.10.0
+        value: 3.10.12
 
