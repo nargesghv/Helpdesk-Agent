@@ -17,8 +17,8 @@ from pydantic import BaseModel, Field
 import uvicorn
 import pandas as pd
 
-# Import the ticket processing logic
-from ticket_graph import build_graph, GraphState
+# Import the lightweight ticket processing logic
+from ticket_graph_lite import build_graph, GraphState
 
 # -------------------- Pydantic Models --------------------
 
@@ -62,19 +62,13 @@ graph = None
 base_state: GraphState = {}
 
 def initialize_graph():
-    """Initialize the LangGraph pipeline"""
+    """Initialize the lightweight pipeline"""
     global graph, base_state
     
-    if not os.getenv("GROQ_API_KEY"):
-        raise ValueError("GROQ_API_KEY not set")
+    if not os.getenv("OPENAI_API_KEY"):
+        raise ValueError("OPENAI_API_KEY not set")
     
-    graph = build_graph(
-        alpha=0.6,
-        k=5,
-        groq_model="llama-3.1-8b-instant",
-        deterministic=False,
-        force_rebuild=False
-    ).compile()
+    graph = build_graph()
     
     base_state = {
         "data_dir": "Data",
@@ -249,7 +243,7 @@ async def process_tickets():
                 state["logs"] = []
                 
                 # Process through graph
-                result = graph.invoke(state)
+                result = graph["invoke"](state)
                 
                 # Persist artifacts for next ticket
                 base_state.update({
