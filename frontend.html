@@ -372,11 +372,10 @@
 
     <script>
         // Configure your backend URL here
-        // For local backend: 'http://localhost:8004'
-        // For deployed backend: 'https://your-backend-url.com'
+        // Backend API URL
         const API_URL = window.location.hostname === 'localhost' 
             ? 'http://localhost:8004' 
-            : 'http://localhost:8004';  // Change this to your deployed backend URL
+            : 'https://helpdesk-agent.onrender.com';
 
         // Submit ticket form
         document.getElementById('ticketForm').addEventListener('submit', async (e) => {
