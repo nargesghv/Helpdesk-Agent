@@ -1,4 +1,4 @@
-runtime.txt
+# Ignore all backend files - this is frontend only
 requirements.txt
 render.yaml
 backend.py
@@ -11,6 +11,7 @@ output/
 __pycache__/
 *.pyc
 *.py
+!frontend.html
 *.md
 !README.md
 
