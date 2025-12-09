@@ -1,0 +1,16 @@
+runtime.txt
+requirements.txt
+render.yaml
+backend.py
+ticket_graph.py
+ticket_graph_lite.py
+Data/
+artifacts/
+input/
+output/
+__pycache__/
+*.pyc
+*.py
+*.md
+!README.md
+
