@@ -4,10 +4,14 @@ services:
     env: python
     plan: free
     buildCommand: pip cache purge && pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
-    startCommand: uvicorn backend:app --host 0.0.0.0 --port $PORT
+    startCommand: uvicorn backend:app --host 0.0.0.0 --port $PORT --workers 1 --limit-concurrency 10
     envVars:
       - key: GROQ_API_KEY
         sync: false
       - key: PYTHON_VERSION
         value: 3.10.13
+      - key: PYTORCH_MPS_HIGH_WATERMARK_RATIO
+        value: "0.0"
+      - key: TRANSFORMERS_OFFLINE
+        value: "0"
 
